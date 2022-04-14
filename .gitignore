@@ -1,0 +1,6 @@
+venv
+**/venv/**
+**/.ignore/
+**/.spyproject/
+*.exe
+**/__pycache__/
