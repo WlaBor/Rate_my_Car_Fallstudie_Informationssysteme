@@ -106,6 +106,7 @@ class RegistrierFrame(tk.Frame):
         entry_strasse.pack(side=tk.TOP, fill=tk.X, padx=50)
         entry_strasse.entry.bind('<FocusIn>', lambda *args: focusin(lbl_strasse, entry_strasse))
         entry_strasse.entry.bind('<FocusOut>', lambda *args: focusout(lbl_strasse, entry_strasse))
+        entry_strasse.trace = False
 
         # ////////////////////////////////////////////
         # Label Postleitzahl
@@ -120,6 +121,7 @@ class RegistrierFrame(tk.Frame):
         entry_plz.entry.bind('<FocusOut>', lambda *args: focusout(lbl_plz, entry_plz))
 
         # Eingabekontrolle PLZ
+
         def callback(val):
             if str.isdigit(val) or val == "":
                 return True

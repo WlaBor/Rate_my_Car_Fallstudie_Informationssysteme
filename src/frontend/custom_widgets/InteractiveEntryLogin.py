@@ -14,6 +14,8 @@ class InteractiveEntryLogin(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
 
+        self.trace = True
+
         self.layout()
 
     @property
@@ -33,7 +35,8 @@ class InteractiveEntryLogin(tk.Frame):
         str_var = tk.StringVar(self)
 
         def trace_keine_leerzeile(*args):
-            str_var.set(str_var.get().strip())
+            if self.trace == True:
+                str_var.set(str_var.get().strip())
 
         str_var.trace('w', trace_keine_leerzeile)
 

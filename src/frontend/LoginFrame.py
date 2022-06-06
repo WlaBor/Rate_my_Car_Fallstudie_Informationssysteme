@@ -2,6 +2,8 @@ import tkinter as tk
 
 from frontend.custom_widgets.InteractiveEntryLogin import InteractiveEntryLogin
 from frontend.custom_widgets.LoginButton import LoginButton
+from frontend.custom_widgets.CanvasLogo import LogoCanvas
+
 import os
 from PIL import ImageTk, Image
 
@@ -39,10 +41,8 @@ class LoginFrame(tk.Frame):
 
         # Logo
         # self.parent.pictures['logo']
-        canvas = tk.Canvas(self, width=600, height=200, bg='#92D050', bd=0, highlightthickness=0, relief='ridge')
-        canvas.place(relx=0.5, rely=0.15, anchor=tk.CENTER)
-        canvas.create_image(300, 100, anchor=tk.CENTER, image=self.parent.pictures['logo'])
-        canvas.image = self.parent.pictures['logo']
+        logo = LogoCanvas(parent=self, controller=self.parent, image_name='logo', size=(600, 150))
+        logo.place(relx=0.5, rely=0.15, anchor=tk.CENTER)
 
         #logo_label = tk.Label(self, image=logo_pic)
         #logo_label.image = logo_pic
@@ -121,21 +121,29 @@ class LoginFrame(tk.Frame):
 
         # ////////////////////////////////////////////
         # Login funktion
-        def login():
+        def login(*args):
+            self.parent.focus()
             # Eingabekontrollen
             # Username
             if self.parent.backend.User.check_User(entry_benutzername.value) == False:
+                lbl_Benutzername.config(fg='red')
+                entry_benutzername.config(bg='red')
                 tk.messagebox.showerror('Achtung', 'Benutzername nicht vorhanden.')
                 return
 
             # Passwort
             if self.parent.backend.User.give_Password_from_User(entry_benutzername.value, entry_passwort.value) == False:
+                lbl_passwort.config(fg='red')
+                entry_passwort.config(bg='red')
                 tk.messagebox.showerror('Achtung', 'Benutzername und Passwort stimmen nicht über ein.')
                 return
 
             # Login erfolgreich -> Home
             self.parent.switch_frames('Home')
             self.destroy()
+
+        entry_benutzername.entry.bind('<Return>', login)
+        entry_passwort.entry.bind('<Return>', login)
 
         # Log In - Button
         btn_login = LoginButton(parent=eingabe_frame, text='Log In', command=login)

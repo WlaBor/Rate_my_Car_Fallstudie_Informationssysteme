@@ -59,8 +59,13 @@ class Application(tk.Tk):
         self.pic_path = os.path.join(self.folder_path, 'pics')
 
     def load_pics(self):
-        self.pictures['logo'] = ImageTk.PhotoImage(Image.open(
-            str(os.path.join(self.pic_path, 'logo.png'))).resize((600, 150)), master=self)
+        # Logo
+        self.pictures['logo'] = Image.open(str(os.path.join(self.pic_path, 'logo.png')))
+
+        # Profil Button
+        self.pictures['profil_btn_off'] = Image.open(str(os.path.join(self.pic_path, 'profil_btn_off.png')))
+        self.pictures['profil_btn_on'] = Image.open(str(os.path.join(self.pic_path, 'profil_btn_on.png')))
+        self.pictures['profil_btn_click'] = Image.open(str(os.path.join(self.pic_path, 'profil_btn_click.png')))
 
     def switch_frames(self, frame_name, *args, **kwargs):
         if self.aktueller_frame != None:
@@ -70,6 +75,10 @@ class Application(tk.Tk):
         frame.pack(fill=tk.BOTH, expand=True)
         #print('Neuer Frame: ' + frame_name)
         self.aktueller_frame = frame
+
+    def get_mouse_position(self):
+        print((self.winfo_pointerx() - self.winfo_vrootx(), self.winfo_pointery() - self.winfo_vrooty()))
+        return self.winfo_pointerx() - self.winfo_vrootx(), self.winfo_pointery() - self.winfo_vrooty()
 
 
 if __name__ == '__main__':

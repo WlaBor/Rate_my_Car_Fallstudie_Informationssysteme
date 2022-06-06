@@ -117,9 +117,9 @@ class User:
                       SELECT passwort FROM USER WHERE username = ?
                       ''', (username,))
             records = c.fetchall()
-            print(records)
+            # print(records)
             if records != []:
-                print(records[0])
+                # print(records[0])
                 if records[0][0] == password:
                     result = True
 
