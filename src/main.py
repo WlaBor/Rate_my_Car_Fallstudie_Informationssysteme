@@ -35,8 +35,19 @@ class Application(tk.Tk):
             'Home': HomeFrame
         }
         self.aktueller_frame = None
+        self.workingarea = None
+        self.active_user = None
 
         self.switch_frames('LogIn')
+
+    @property
+    def active_user(self):
+        return self._active_user
+
+    @active_user.setter
+    def active_user(self, username):
+        self._active_user = username
+        print('Aktiver User: ' + str(self._active_user))
 
     def configurations(self):
         # Titel der Applikation
@@ -66,6 +77,53 @@ class Application(tk.Tk):
         self.pictures['profil_btn_off'] = Image.open(str(os.path.join(self.pic_path, 'profil_btn_off.png')))
         self.pictures['profil_btn_on'] = Image.open(str(os.path.join(self.pic_path, 'profil_btn_on.png')))
         self.pictures['profil_btn_click'] = Image.open(str(os.path.join(self.pic_path, 'profil_btn_click.png')))
+
+        # Settings Button
+        self.pictures['settings_btn_off'] = Image.open(str(os.path.join(self.pic_path, 'settings_btn_off.png')))
+        self.pictures['settings_btn_on'] = Image.open(str(os.path.join(self.pic_path, 'settings_btn_on.png')))
+        self.pictures['settings_btn_click'] = Image.open(str(os.path.join(self.pic_path, 'settings_btn_click.png')))
+
+        # notifications Button
+        self.pictures['notifications_btn_off'] = Image.open(
+            str(os.path.join(self.pic_path, 'notifications_btn_off.png')))
+        self.pictures['notifications_btn_on'] = Image.open(str(os.path.join(self.pic_path, 'notifications_btn_on.png')))
+        self.pictures['notifications_btn_click'] = Image.open(
+            str(os.path.join(self.pic_path, 'notifications_btn_click.png')))
+
+        # home Button
+        self.pictures['home_btn_off'] = Image.open(str(os.path.join(self.pic_path, 'home_btn_off.png')))
+        self.pictures['home_btn_on'] = Image.open(str(os.path.join(self.pic_path, 'home_btn_on.png')))
+        self.pictures['home_btn_click'] = Image.open(str(os.path.join(self.pic_path, 'home_btn_click.png')))
+
+        # home neue suche Button
+        self.pictures['neue_suche_home_btn_off'] = Image.open(
+            str(os.path.join(self.pic_path, 'neue_suche_home_btn_off.png')))
+        self.pictures['neue_suche_home_btn_on'] = Image.open(
+            str(os.path.join(self.pic_path, 'neue_suche_home_btn_on.png')))
+        self.pictures['neue_suche_home_btn_click'] = Image.open(
+            str(os.path.join(self.pic_path, 'neue_suche_home_btn_click.png')))
+
+        # home neue suche Button
+        self.pictures['meine_suchen_home_btn_off'] = Image.open(
+            str(os.path.join(self.pic_path, 'meine_suchen_home_btn_off.png')))
+        self.pictures['meine_suchen_home_btn_on'] = Image.open(
+            str(os.path.join(self.pic_path, 'meine_suchen_home_btn_on.png')))
+        self.pictures['meine_suchen_home_btn_click'] = Image.open(
+            str(os.path.join(self.pic_path, 'meine_suchen_home_btn_click.png')))
+
+        # toggle Button
+        self.pictures['toggle_off'] = Image.open(str(os.path.join(self.pic_path, 'toggle_off.png')))
+        self.pictures['toggle_on'] = Image.open(str(os.path.join(self.pic_path, 'toggle_on.png')))
+
+        # Lupe Logo
+        self.pictures['lupe_logo'] = Image.open(str(os.path.join(self.pic_path, 'lupe_logo.png')))
+
+        # trichter Logo
+        self.pictures['trichter_logo'] = Image.open(str(os.path.join(self.pic_path, 'trichter_logo.png')))
+
+        # näher betrachten Logo
+        self.pictures['näher_betrachten_logo'] = Image.open(
+            str(os.path.join(self.pic_path, 'näher_betrachten_logo.png')))
 
     def switch_frames(self, frame_name, *args, **kwargs):
         if self.aktueller_frame != None:

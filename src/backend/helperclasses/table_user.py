@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Jun  4 13:08:09 2022
-
-@author: wladi
-"""
 import sqlite3
 
 
@@ -40,7 +34,8 @@ class User:
                       ([username] TEXT NOT NULL PRIMARY KEY,
                        [passwort] TEXT NOT NULL,
                        [straße] TEXT,
-                       [postleitzahl] INTEGER
+                       [postleitzahl] INTEGER,
+                       [is_premium] INTEGER NOT NULL
                        )
                       ''')
             print('USER Tabelle erfolgreich')
@@ -62,8 +57,8 @@ class User:
 
         try:
             c.execute('''
-                      INSERT INTO USER (username, passwort, straße, postleitzahl)
-                      VALUES (?,?,?,?)
+                      INSERT INTO USER (username, passwort, straße, postleitzahl, is_premium)
+                      VALUES (?,?,?,?, 0)
                       ''', export)
             conn.commit()
             print('USER INSERT erfolgreich')
@@ -102,7 +97,77 @@ class User:
         return result
 
     # ////////////////////////////////////////////
+    # check premium
+    def check_UserPremium(self, username):
+        conn = self.create_connection()
+        if conn == None:
+            return True
+
+        c = conn.cursor()
+
+        try:
+            c.execute('''
+                      SELECT is_premium FROM USER WHERE username = ?
+                      ''', (username,))
+            records = c.fetchall()
+            try:
+                records = records[0][0]
+            except:
+                pass
+
+        except Exception as ex:
+            print('Fehler bei USER Tabelle - check User Premium')
+            print(ex)
+            records = []
+
+        conn.close()
+        return records
+
+    # ////////////////////////////////////////////
+    # aktiviere premium
+    def activate_premium(self, username):
+        conn = self.create_connection()
+        if conn == None:
+            return True
+
+        c = conn.cursor()
+
+        try:
+            c.execute('''
+                      UPDATE USER
+                      SET is_premium = 1
+                      WHERE username = ?
+                      ''', (username,))
+
+            conn.commit()
+        except Exception as ex:
+            print('Fehler bei Premium Aktivierung:')
+            print(ex)
+
+    # ////////////////////////////////////////////
+    # aktiviere premium
+    def deactivate_premium(self, username):
+        conn = self.create_connection()
+        if conn == None:
+            return True
+
+        c = conn.cursor()
+
+        try:
+            c.execute('''
+                      UPDATE USER
+                      SET is_premium = 0
+                      WHERE username = ?
+                      ''', (username,))
+
+            conn.commit()
+        except Exception as ex:
+            print('Fehler bei Premium Aktivierung:')
+            print(ex)
+
+    # ////////////////////////////////////////////
     # Check Passwort von User
+
     def give_Password_from_User(self, username, password):
         conn = self.create_connection()
         if conn == None:

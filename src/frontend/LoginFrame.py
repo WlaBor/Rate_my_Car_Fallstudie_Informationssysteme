@@ -139,6 +139,7 @@ class LoginFrame(tk.Frame):
                 return
 
             # Login erfolgreich -> Home
+            self.parent.active_user = entry_benutzername.value
             self.parent.switch_frames('Home')
             self.destroy()
 

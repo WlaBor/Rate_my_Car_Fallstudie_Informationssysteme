@@ -16,5 +16,8 @@ conn = sqlite3.connect(db_path)
 
 USER = pd.read_sql_query("SELECT * FROM USER", conn)
 
-conn.commit()
+AUTOMODELL = pd.read_sql_query("SELECT * FROM AUTOMODELL", conn)
+
+ANZEIGE = pd.read_sql_query("SELECT * FROM ANZEIGE", conn)
+
 conn.close()

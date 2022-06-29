@@ -33,10 +33,22 @@ class LogoCanvas(tk.Frame):
         image = self.controller.pictures[self.image_name].resize(self.size)
 
         image = ImageTk.PhotoImage(image, master=self.parent)
+        self.image = image
 
-        canvas.create_image(0, 0, anchor=tk.NW, image=image)
-        canvas.image = image
+        self.image_on_canvas = canvas.create_image(0, 0, anchor=tk.NW, image=image)
+        canvas.image = self.image
 
         canvas.pack(fill=tk.BOTH, expand=True)
 
         self.canvas = canvas
+
+    def change_pic(self, pic_name, size=None):
+        if size != None:
+            self.size = size
+        image = self.controller.pictures[pic_name].resize(self.size)
+
+        image = ImageTk.PhotoImage(image, master=self.parent)
+        self.image = image
+        self.canvas.image = self.image
+
+        self.canvas.itemconfig(self.image_on_canvas, image=image)
