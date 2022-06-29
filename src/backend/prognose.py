@@ -83,7 +83,7 @@ class Prognose:
         # Ausreißer
         z_score = 2
         # Preis
-        df = df[df['preis'] < 500000]
+        # df = df[df['preis'] < 500000]
         df = df[df['preis'] > 0]
         df = df[stats.zscore(df.preis) < z_score]
 
