@@ -343,7 +343,8 @@ class EingabeMaskeFrame(tk.Frame):
                 'auto_kilometerstand': self.regression_eingaben['kilometerstand'],
                 'getriebe': self.regression_eingaben['getriebe'],
                 'antriebsart': self.regression_eingaben['antrieb'],
-                'schaden_vorhanden': self.regression_eingaben['autoschaden']
+                'schaden_vorhanden': self.regression_eingaben['autoschaden'],
+                'erstzulassung': int(self.regression_eingaben['erstzulassung'])
             }).pack(fill=tk.BOTH, expand=True)
 
         self.btn_weiter_regression.config(command=command_ergebnis)

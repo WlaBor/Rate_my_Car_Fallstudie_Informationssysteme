@@ -20,7 +20,7 @@ class Prognose:
                  auto_kilometerstand,
                  getriebe,
                  antriebsart,
-                 schaden_vorhanden):
+                 schaden_vorhanden, *args, **kwargs):
         self.controller = controller
         self.db_path = controller.db_path
         self.brand = brand
@@ -32,6 +32,7 @@ class Prognose:
         self.getriebe = getriebe
         self.antriebsart = antriebsart
         self.schaden_vorhanden = schaden_vorhanden
+        self.erszulassung = kwargs.pop('erstzulassung', None)
 
         print('Regression für {}-{}-{}'.format(self.brand, self.model, self.vehicletype))
         print('Alter: ' + str(self.auto_alter))

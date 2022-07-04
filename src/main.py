@@ -125,6 +125,9 @@ class Application(tk.Tk):
         self.pictures['näher_betrachten_logo'] = Image.open(
             str(os.path.join(self.pic_path, 'näher_betrachten_logo.png')))
 
+        # auto dummy
+        self.pictures['auto_dummy'] = Image.open(str(os.path.join(self.pic_path, 'auto_dummy.png')))
+
     def switch_frames(self, frame_name, *args, **kwargs):
         if self.aktueller_frame != None:
             #print('Alter Frame: ' + str(self.aktueller_frame))

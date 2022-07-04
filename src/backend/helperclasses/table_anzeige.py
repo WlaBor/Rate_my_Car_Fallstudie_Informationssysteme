@@ -6,6 +6,8 @@ Created on Sat Jun  4 13:08:09 2022
 """
 import sqlite3
 import uuid
+import pandas as pd
+from scipy import stats
 
 
 class Anzeige:
@@ -93,3 +95,73 @@ class Anzeige:
             print('Fehler bei ANZEIGE Tabelle')
             print(ex)
         conn.close()
+
+    # Anzeigen für ein bestimmtes Auto als DataFrame ausgeben
+    def load_data_as_df(self, brand, model, vehicletype):
+
+        conn = sqlite3.connect(self.db_path)
+        c = conn.cursor()
+        c.execute('''
+                  SELECT id FROM AUTOMODELL
+                  WHERE (marke, model, fahrzeug_typ) = (?,?,?)
+                  ORDER BY model
+                  ''', (brand, model, vehicletype))
+
+        auto_id = [element[0] for element in c.fetchall()][0]
+
+        raw_df = pd.read_sql('''
+                                  SELECT * FROM ANZEIGE WHERE automodell_id = "{}"
+                                  '''.format(auto_id), conn)
+
+        print('Anzahl Daten: ' + str(len(raw_df)))
+
+        conn.close()
+        return raw_df
+
+    def load_data_with_filter(self, brand, model, vehicletype):
+        df = self.load_data_as_df(brand, model, vehicletype)
+
+        # Datenvorverarbeitung
+        # Ausreißer
+        z_score = 2
+        # Preis
+        # df = df[df['preis'] < 500000]
+        df = df[df['preis'] > 0]
+        df = df[stats.zscore(df.preis) < z_score]
+
+        # Age
+        df = df[df['auto_alter'] >= 0]
+        df = df[stats.zscore(df['auto_alter']) < z_score]
+
+        # Power
+        df = df[df['auto_leistung_ps'] > 20]
+        df = df[stats.zscore(df['auto_leistung_ps']) < z_score]
+
+        # Konvertierung
+        df = df.join(pd.get_dummies(df['auto_getriebe'], prefix='getriebe'))
+        df = df.join(pd.get_dummies(df['auto_kraftstoff'], prefix='fuel'))
+        df = df.join(pd.get_dummies(df['auto_schaden'], prefix='schaden'))
+        df.sort_values(by='datum_erstellt', inplace=True)
+        df['datum_verschwunden_date'] = pd.to_datetime(df['datum_verschwunden']).dt.date
+        df['datum_erstellt_date'] = pd.to_datetime(df['datum_erstellt']).dt.date
+
+        # =============================================================================
+        #         df = df.drop(columns=['auto_baujahr', 'id', 'automodell_id', 'name',
+        #                               'postleitzahl', 'datum_erstellt', 'datum_verschwunden',
+        #                               'anzahl_tage_online'])  # Anzahl Tage verschlechter Regression !!
+        #
+        #         self.columns = [
+        #             'auto_alter', 'auto_leistung_ps', 'auto_kilometerstand',
+        #             'getriebe_0', 'getriebe_1',
+        #             'fuel_benzin', 'fuel_diesel', 'fuel_cng', 'fuel_lpg', 'fuel_hybrid', 'fuel_elektro',
+        #             'schaden_0', 'schaden_1',
+        #             'preis'
+        #         ]
+        #
+        #         for col in self.columns:
+        #             if col not in df.columns:
+        #                 df[col] = 0
+        #         df = df[self.columns]
+        # =============================================================================
+
+        return df
