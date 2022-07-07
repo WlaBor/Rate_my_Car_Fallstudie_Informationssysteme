@@ -10,6 +10,7 @@ import sqlite3
 from backend.helperclasses.table_user import User
 from backend.helperclasses.table_automodell import Automodel
 from backend.helperclasses.table_anzeige import Anzeige
+from backend.helperclasses.table_suchen import Suchanfragen
 
 
 class Backend:
@@ -25,3 +26,6 @@ class Backend:
 
         # Anzeige Modul
         self.Anzeige = Anzeige(self.db_path)
+
+        # Suchen Modul
+        self.Suche = Suchanfragen(self.db_path)

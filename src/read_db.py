@@ -20,4 +20,6 @@ AUTOMODELL = pd.read_sql_query("SELECT * FROM AUTOMODELL", conn)
 
 ANZEIGE = pd.read_sql_query("SELECT * FROM ANZEIGE", conn)
 
+SUCHEN = pd.read_sql_query("SELECT * FROM SUCHEN", conn)
+
 conn.close()

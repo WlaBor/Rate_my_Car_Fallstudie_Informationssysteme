@@ -9,6 +9,7 @@ from scipy import stats
 import numpy as np
 from catboost import CatBoostRegressor
 from sklearn.metrics import r2_score
+import sklearn.utils._typedefs
 
 
 class Prognose:

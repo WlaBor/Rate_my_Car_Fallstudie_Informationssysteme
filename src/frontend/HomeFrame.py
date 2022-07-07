@@ -4,6 +4,7 @@ from frontend.custom_widgets.ButtonLogo import ButtonCanvas
 from frontend.custom_widgets.ToggleButton import ToggleButton
 from frontend.EingabeMaske import EingabeMaskeFrame
 from frontend.MeineSuchen import MeineSuchenFrame
+from frontend.ErgebnisFrame import ErgebnisFrame
 
 PROFIL_BUTTONS_DESIGN = {
     'bg': '#92D050',
@@ -31,12 +32,25 @@ PROFIL_BUTTONS_DESIGN_ON = {
     'anchor': 'w'
 }
 
+UEBERSCHRIFT_DESIGN = {
+    'bg': '#E2E2E2',
+    'font': ('Arial', 24, 'bold'),
+    # 'fg': '#618A35'
+}
+
+UEBERSCHRIFT_DESIGN_2 = {
+    'bg': '#E2E2E2',
+    'font': ('Arial', 20),
+    # 'fg': '#618A35'
+}
+
 
 class HomeFrame(tk.Frame):
 
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent)
         self.parent = parent
+        self.controller = parent
 
         self.layout()
 
@@ -199,9 +213,159 @@ class HomeFrame(tk.Frame):
         self.workingarea.bind('<ButtonPress-1>', self.bind_destroy_profilframe)
 
         # Meine letzte Suche
-        letzte_suche_frame = tk.Frame(self.workingarea, bg='#C1C1C1', width=600)
+        letzte_suche_frame = tk.Frame(self.workingarea, bg='#E2E2E2', width=600)
         letzte_suche_frame.pack(side=tk.LEFT, fill=tk.Y,  padx=30, pady=30)
         letzte_suche_frame.bind('<ButtonPress-1>', self.bind_destroy_profilframe)
+        letzte_suche_frame.pack_propagate(False)
+
+        tk.Label(letzte_suche_frame, text='Willkommen, {}'.format(
+            self.controller.active_user), **UEBERSCHRIFT_DESIGN).pack(side=tk.TOP, anchor=tk.NW)
+
+        tk.Label(letzte_suche_frame, text='Deine letzte Suche:', **
+                 UEBERSCHRIFT_DESIGN_2).pack(side=tk.TOP, anchor=tk.NW, pady=(40, 5))
+
+        ##############################
+        meine_suchen_df = self.meine_suchen_df = self.controller.backend.Suche.load_data_from_user_as_df(
+            self.controller.active_user)
+
+        suche_frame_bg = tk.Frame(letzte_suche_frame, bg='#92D050',
+                                  width=600, height=500)
+        suche_frame_bg.pack(side=tk.TOP, padx=20, pady=(5, 20))
+        suche_frame_bg.pack_propagate(False)
+        suche_frame_ = tk.Frame(suche_frame_bg, bg='#ECF7E1')
+        suche_frame_.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=3, pady=3)
+        suche_frame_.pack_propagate(False)
+
+        # Abfrage ob Suchanfragen vorhanden sind
+        if len(meine_suchen_df) > 0:
+            dictionary = meine_suchen_df[meine_suchen_df['zeitpunkt']
+                                         == meine_suchen_df['zeitpunkt'].max()].iloc[0].to_dict()
+
+            print(dictionary)
+
+            # Header
+            header_frame = tk.Frame(suche_frame_, bg='#92D050', height=50)
+            header_frame.pack(side=tk.TOP, fill=tk.X)
+            tk.Label(header_frame, text=str(str(dictionary['eingaben_brand']) + ' - ' + str(dictionary['eingaben_model']) + ' - ' + str(
+                dictionary['eingaben_vehicletype'])).upper().replace('_', ' '), bg='#92D050', fg='white', font=('Arial', 15)).pack(side=tk.LEFT, expand=True)
+
+            TEXT = {
+                'bg': '#ECF7E1',
+                'font': ('Arial', 15)
+            }
+            TEXT_GREEN = {
+                'bg': '#92D050',
+                'font': ('Arial', 15),
+                'fg': 'white'
+            }
+
+            # Erstzulassung
+            erstzulassung_frame = tk.Frame(suche_frame_, bg='#ECF7E1')
+            erstzulassung_frame.pack(side=tk.TOP, fill=tk.X)
+            tk.Label(erstzulassung_frame, text='Erstzulassung', **
+                     TEXT).pack(side=tk.LEFT, expand=False, anchor=tk.W, padx=(50, 10), pady=10)
+            ez_green_frame = tk.Frame(erstzulassung_frame, bg=TEXT_GREEN['bg'], height=30, width=250)
+            ez_green_frame.pack_propagate(False)
+            ez_green_frame.pack(side=tk.LEFT, expand=True, anchor=tk.E, padx=(0, 50), pady=10)
+            tk.Label(ez_green_frame, text=str(
+                int(dictionary['eingaben_erstzulassung'])), **TEXT_GREEN).pack(expand=True)
+
+            # kilometerstand
+            kilometerstand_frame = tk.Frame(suche_frame_, bg='#ECF7E1')
+            kilometerstand_frame.pack(side=tk.TOP, fill=tk.X)
+            tk.Label(kilometerstand_frame, text='Kilometerstand', **
+                     TEXT).pack(side=tk.LEFT, expand=False, anchor=tk.W, padx=(50, 10), pady=10)
+            kilometerstand_green_frame = tk.Frame(kilometerstand_frame, bg=TEXT_GREEN['bg'], height=30, width=250)
+            kilometerstand_green_frame.pack_propagate(False)
+            kilometerstand_green_frame.pack(side=tk.LEFT, expand=True, anchor=tk.E, padx=(0, 50), pady=10)
+            tk.Label(kilometerstand_green_frame, text=str(
+                int(dictionary['eingaben_kilometerstand'])) + ' km', **TEXT_GREEN).pack(expand=True)
+
+            # leistung
+            leistung_frame = tk.Frame(suche_frame_, bg='#ECF7E1')
+            leistung_frame.pack(side=tk.TOP, fill=tk.X)
+            tk.Label(leistung_frame, text='Leistung', **
+                     TEXT).pack(side=tk.LEFT, expand=False, anchor=tk.W, padx=(50, 10), pady=10)
+            leistung_green_frame = tk.Frame(leistung_frame, bg=TEXT_GREEN['bg'], height=30, width=250)
+            leistung_green_frame.pack_propagate(False)
+            leistung_green_frame.pack(side=tk.LEFT, expand=True, anchor=tk.E, padx=(0, 50), pady=10)
+            tk.Label(leistung_green_frame, text=str(
+                int(dictionary['eingaben_leistung_ps'])) + ' PS', **TEXT_GREEN).pack(expand=True)
+
+            # getriebe
+            getriebe_frame = tk.Frame(suche_frame_, bg='#ECF7E1')
+            getriebe_frame.pack(side=tk.TOP, fill=tk.X)
+            tk.Label(getriebe_frame, text='Getriebe', **
+                     TEXT).pack(side=tk.LEFT, expand=False, anchor=tk.W, padx=(50, 10), pady=10)
+            getriebe_green_frame = tk.Frame(getriebe_frame, bg=TEXT_GREEN['bg'], height=30, width=250)
+            getriebe_green_frame.pack_propagate(False)
+            getriebe_green_frame.pack(side=tk.LEFT, expand=True, anchor=tk.E, padx=(0, 50), pady=10)
+            tk.Label(getriebe_green_frame, text=str(
+                dictionary['eingaben_getriebe']), **TEXT_GREEN).pack(expand=True)
+
+            # kraftstoff
+            kraftstoff_frame = tk.Frame(suche_frame_, bg='#ECF7E1')
+            kraftstoff_frame.pack(side=tk.TOP, fill=tk.X)
+            tk.Label(kraftstoff_frame, text='Kraftstoff', **
+                     TEXT).pack(side=tk.LEFT, expand=False, anchor=tk.W, padx=(50, 10), pady=10)
+            kraftstoff_green_frame = tk.Frame(kraftstoff_frame, bg=TEXT_GREEN['bg'], height=30, width=250)
+            kraftstoff_green_frame.pack_propagate(False)
+            kraftstoff_green_frame.pack(side=tk.LEFT, expand=True, anchor=tk.E, padx=(0, 50), pady=10)
+            tk.Label(kraftstoff_green_frame, text=str(
+                dictionary['eingaben_fueltype']), **TEXT_GREEN).pack(expand=True)
+
+            # preis
+            preis_frame = tk.Frame(suche_frame_, bg='#ECF7E1')
+            preis_frame.pack(side=tk.TOP, fill=tk.X)
+            tk.Label(preis_frame, text='Prognostizierter\nPreis', **
+                     TEXT, justify=tk.LEFT).pack(side=tk.LEFT, expand=False, anchor=tk.W, padx=(50, 10), pady=10)
+            preis_green_frame = tk.Frame(preis_frame, bg=TEXT_GREEN['bg'], height=30, width=250)
+            preis_green_frame.pack_propagate(False)
+            preis_green_frame.pack(side=tk.LEFT, expand=True, anchor=tk.E, padx=(0, 50), pady=10)
+            tk.Label(preis_green_frame, text=str(int(
+                dictionary['prognose_preis'])) + ' €', anchor=tk.W, **TEXT_GREEN).pack(expand=True)
+
+            #####
+            # Button
+            def command_ergebnis(*args):
+
+                dic = dictionary
+
+                for widgets in self.workingarea.winfo_children():
+                    widgets.forget()
+                ErgebnisFrame(self.workingarea, self.controller, regression_daten_dic={
+                    'brand': dic['eingaben_brand'],
+                    'model': dic['eingaben_model'],
+                    'vehicletype': dic['eingaben_vehicletype'],
+                    'auto_alter': 2016 - int(dic['eingaben_erstzulassung']),
+                    'auto_leistung_ps': int(dic['eingaben_leistung_ps']),
+                    'auto_kilometerstand': int(dic['eingaben_kilometerstand']),
+                    'getriebe': dic['eingaben_getriebe'],
+                    'antriebsart': dic['eingaben_fueltype'],
+                    'schaden_vorhanden': dic['eingaben_schaden_vorhanden'],
+                    'erstzulassung': int(dic['eingaben_erstzulassung'])
+                }, save=False).pack(fill=tk.BOTH, expand=True)
+
+            btn = tk.Button(suche_frame_, text='Letzte Suche öffnen', command=command_ergebnis,
+                            bg='#92D050', font=('Arial', 18, 'bold'), cursor='hand2', fg='white')
+            btn.pack(side=tk.BOTTOM, anchor=tk.E, padx=10, pady=10)
+            btn.bind('<Enter>', lambda *args: btn.config(bg='#C7E7A6', fg='white'))
+            btn.bind('<Leave>', lambda *args: btn.config(bg='#92D050', fg='white'))
+
+        ###############################################
+        ###############################################
+        else:
+            tk.Label(suche_frame_, text='Du hast noch keine Suchen durchgeführt.',
+                     font=('Arial', 17), bg='#ECF7E1').pack(
+                side=tk.TOP, expand=True, anchor=tk.S)
+
+            label_suche_starten = tk.Label(suche_frame_, text='Starte deine erste Suche',
+                                           font=('Arial', 17, 'bold'), bg='#ECF7E1', fg='#618A35', cursor='hand2')
+            label_suche_starten.pack(
+                side=tk.TOP, expand=True, pady=20, anchor=tk.N)
+            label_suche_starten.bind('<Enter>', lambda *args: label_suche_starten.config(fg='#92D050'))
+            label_suche_starten.bind('<Leave>', lambda *args: label_suche_starten.config(fg='#618A35'))
+            label_suche_starten.bind('<Button-1>', self.command_eingabemaske_oeffnen)
 
         # ////////////////////////////////////////////
 

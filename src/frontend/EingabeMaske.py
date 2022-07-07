@@ -32,7 +32,14 @@ class EingabeMaskeFrame(tk.Frame):
         self.parent = parent
         self.controller = controller
 
-        self.auto_marken = self.controller.backend.Automodel.get_unqiue_marken()
+        marken = self.controller.backend.Automodel.get_unqiue_marken()
+        self.auto_marken = []
+        for x in marken:
+            if x.lower() == 'bmw':
+                self.auto_marken.append('BMW')
+                continue
+            self.auto_marken.append(x.title().replace('_', ' '))
+
         print(self.auto_marken)
 
         self.betrachtungs_raum = {
@@ -135,11 +142,14 @@ class EingabeMaskeFrame(tk.Frame):
 
     # Automarke
     def select_marke(self, *args):
-        marke = self.cb_marke.value
+        marke = self.cb_marke.value.lower().replace(' ', '_')
 
         modelle = self.controller.backend.Automodel.get_unique_models_from_brand(marke)
+        self.modelle = []
+        for x in modelle:
+            self.modelle.append(x.title().replace('_', ' '))
 
-        self.cb_model.values = modelle
+        self.cb_model.values = self.modelle
 
         self.cb_model.forget()
         self.cb_typ.forget()
@@ -155,13 +165,17 @@ class EingabeMaskeFrame(tk.Frame):
         print(modelle)
 
     def select_model(self, *args):
-        marke = self.cb_marke.value
-        model = self.cb_model.value
+        marke = self.cb_marke.value.lower().replace(' ', '_')
+        model = self.cb_model.value.lower().replace(' ', '_')
 
         types = self.controller.backend.Automodel.get_unique_cartype_from_brand_model(marke, model)
         print(types)
 
-        self.cb_typ.values = types
+        self.types = []
+        for x in types:
+            self.types.append(x.title().replace('_', ' '))
+
+        self.cb_typ.values = self.types
 
         self.cb_typ.forget()
         self.cb_typ.combobox.set('')
@@ -173,9 +187,9 @@ class EingabeMaskeFrame(tk.Frame):
         }
 
     def select_type(self, *args):
-        marke = self.cb_marke.value
-        model = self.cb_model.value
-        typ = self.cb_typ.value
+        marke = self.cb_marke.value.lower().replace(' ', '_')
+        model = self.cb_model.value.lower().replace(' ', '_')
+        typ = self.cb_typ.value.lower().replace(' ', '_')
 
         self.betrachtungs_raum = {
             'marke': marke,
@@ -267,7 +281,7 @@ class EingabeMaskeFrame(tk.Frame):
             self.var_getriebe.trace_add(
                 'write', lambda *args: self.command_set_regression_eingaben('getriebe', self.var_getriebe.get()))
         ttk.Combobox(eingabeframe_regression, textvariable=self.var_getriebe, font=font,
-                     state="readonly", values=['Manuell', 'Automatik'], width=15).grid(row=3, column=1, sticky=tk.W, padx=40)
+                     state="readonly", values=self.controller.backend.Automodel.get_unique_getriebe(self.betrachtungs_raum['marke'], self.betrachtungs_raum['model'], self.betrachtungs_raum['typ']), width=15).grid(row=3, column=1, sticky=tk.W, padx=40)
 
         # Antrieb
         tk.Label(eingabeframe_regression, text='Antrieb:', bg=BACKGROUND,

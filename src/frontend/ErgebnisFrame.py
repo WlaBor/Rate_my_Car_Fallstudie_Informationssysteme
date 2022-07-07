@@ -9,6 +9,7 @@ from matplotlib.patches import Rectangle
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import pandas as pd
 import numpy as np
+import seaborn as sns
 
 SUBFRAME_DESIGN = {
     'bg': '#C7E7A6'
@@ -17,7 +18,7 @@ SUBFRAME_DESIGN = {
 
 class ErgebnisFrame(tk.Frame):
 
-    def __init__(self, parent, controller, regression_daten_dic, *args, **kwargs):
+    def __init__(self, parent, controller, regression_daten_dic, save=True, *args, **kwargs):
         super().__init__(parent)
         self.parent = parent
         self.controller = controller
@@ -48,6 +49,11 @@ class ErgebnisFrame(tk.Frame):
         else:
             self.layout_standard()
 
+        if save == True:
+            #############
+            # Suche abspeichern
+            self.suche_speichern()
+
     ################
     # Layout für Premium User
     def layout_premium(self):
@@ -65,8 +71,8 @@ class ErgebnisFrame(tk.Frame):
 
         # Überschrift
         tk.Label(self, text='Preisanalyse', **UEBERSCHRIFT1).pack(side=tk.TOP, anchor=tk.W, padx=20, pady=(20, 2))
-        tk.Label(self, text=str(str(self.regression_daten_dic['brand'])+' '+str(self.regression_daten_dic['model'])+' '+str(
-            self.regression_daten_dic['vehicletype'])).upper(), **UEBERSCHRIFT2).pack(side=tk.TOP, anchor=tk.W, padx=20)
+        tk.Label(self, text=str(str(self.regression_daten_dic['brand'])+' - '+str(self.regression_daten_dic['model'])+' - '+str(
+            self.regression_daten_dic['vehicletype'])).upper().replace('_', ' '), **UEBERSCHRIFT2).pack(side=tk.TOP, anchor=tk.W, padx=20)
 
         # Unterer Berreich
         lower_frame = tk.Frame(self, bg='#E2E2E2')
@@ -101,8 +107,8 @@ class ErgebnisFrame(tk.Frame):
 
         # Überschrift
         tk.Label(self, text='Preisanalyse', **UEBERSCHRIFT1).pack(side=tk.TOP, anchor=tk.W, padx=20, pady=(20, 2))
-        tk.Label(self, text=str(str(self.regression_daten_dic['brand'])+' '+str(self.regression_daten_dic['model'])+' '+str(
-            self.regression_daten_dic['vehicletype'])).upper(), **UEBERSCHRIFT2).pack(side=tk.TOP, anchor=tk.W, padx=20)
+        tk.Label(self, text=str(str(self.regression_daten_dic['brand'])+' - '+str(self.regression_daten_dic['model'])+' - '+str(
+            self.regression_daten_dic['vehicletype'])).upper().replace('_', ' '), **UEBERSCHRIFT2).pack(side=tk.TOP, anchor=tk.W, padx=20)
 
         # Unterer Berreich
         lower_frame = tk.Frame(self, bg='#E2E2E2')
@@ -328,7 +334,11 @@ class ErgebnisFrame(tk.Frame):
         bereich_schlecht = (int(preis_prognose + 1.5 * STD_STEP), int(preis_prognose + 2.5 * STD_STEP))
 
         grenze_0 = bereich_sehr_gut[0]
+        if grenze_0 < 0:
+            grenze_0 = 0
         grenze_1 = bereich_sehr_gut[1]
+        if grenze_1 < 0:
+            grenze_1 = 0
         grenze_2 = bereich_fair[0]
         grenze_3 = bereich_fair[1]
         grenze_4 = bereich_schlecht[0]
@@ -453,6 +463,12 @@ class ErgebnisFrame(tk.Frame):
         grenze_4 = bereich_schlecht[0]
         grenze_5 = bereich_schlecht[1]
 
+        if grenze_0 < 0:
+            grenze_0 = 0
+        grenze_1 = bereich_sehr_gut[1]
+        if grenze_1 < 0:
+            grenze_1 = 0
+
         print('Grenzen: ' + str(grenze_0) + ' __ ' +
               str(grenze_1) + ' __ ' +
               str(grenze_2) + ' __ ' +
@@ -537,7 +553,7 @@ class ErgebnisFrame(tk.Frame):
 
         # ////////////////////////////////////////////
         # Restlichen Plots
-        plot_frame = tk.Frame(frame, bg='yellow')
+        plot_frame = tk.Frame(frame, bg='#E2E2E2')
         plot_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=5, pady=5)
         self.erstelle_plot(plot_frame)
 
@@ -830,6 +846,12 @@ class ErgebnisFrame(tk.Frame):
         grenze_4 = bereich_schlecht[0]
         grenze_5 = bereich_schlecht[1]
 
+        if grenze_0 < 0:
+            grenze_0 = 0
+        grenze_1 = bereich_sehr_gut[1]
+        if grenze_1 < 0:
+            grenze_1 = 0
+
         print('Grenzen: ' + str(grenze_0) + ' __ ' +
               str(grenze_1) + ' __ ' +
               str(grenze_2) + ' __ ' +
@@ -914,7 +936,7 @@ class ErgebnisFrame(tk.Frame):
 
         # ////////////////////////////////////////////
         # Restlichen Plots
-        plot_frame = tk.Frame(frame, bg='yellow')
+        plot_frame = tk.Frame(frame, bg='#E2E2E2')
         plot_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True, padx=5, pady=5)
         self.erstelle_plot(plot_frame)
 
@@ -957,18 +979,24 @@ class ErgebnisFrame(tk.Frame):
         patches, texts, _ = ax1.pie(anzahl, explode=None, labels=None, autopct='',
                                     shadow=True, startangle=90, colors=colors[0:len(anzahl)], labeldistance=1.05)
         labels = ['{0} - {1:1.2f} %'.format(i, j) for i, j in zip(labels, 100.*np.array(anzahl)/np.array(anzahl).sum())]
-        ax1.legend(patches, labels, loc='left center', bbox_to_anchor=(0.1, 1.),
+        ax1.legend(patches, labels, loc='best', bbox_to_anchor=(0.1, 1.),
                    fontsize=10)
 
         ax1.set_title('Antrieb', fontweight='bold')
 
-        # Boxplots
-        data = [self.filter_df['auto_kilometerstand'], self.filter_df['auto_leistung_ps'], self.filter_df['auto_alter']]
-        ax2.boxplot(data)
-        ax2.yaxis.grid(False)
-        ax2.xaxis.grid(False)
+        # Histogramm
+        nbins = 40
+        hist = sns.histplot(data=self.filter_df, x="preis", ax=ax2, color='#92D050', bins=nbins)
+        hist.axvline(self.preisprognose, color='#405C23')
+        counts, bins = np.histogram(self.filter_df['preis'], bins=nbins)
+        hist.text(int(self.preisprognose + self.filter_df['preis'].max()*0.02), int(counts.max() * 0.95), 'Prognose',
+                  fontweight='bold', color='#405C23')
+        ax2.yaxis.grid(True)
+        ax2.xaxis.grid(True)
+        ax2.set_facecolor('#F1F5EF')
+        ax2.set_xlabel('Preis [€]')
 
-        # Timeline Erstellte Anzeigen
+        # Timeline Anzeigen
         str_dates = []
         for x in last_30_days_date:
             str_dates.append(str(x))
@@ -1003,4 +1031,19 @@ class ErgebnisFrame(tk.Frame):
         canvas = FigureCanvasTkAgg(fig, frame)
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-        plt.close()
+    def suche_speichern(self):
+        try:
+            self.controller.backend.Suche.save_suche(user_name=self.controller.active_user,
+                                                     brand=self.regression_daten_dic['brand'],
+                                                     model=self.regression_daten_dic['model'],
+                                                     vehicletype=self.regression_daten_dic['vehicletype'],
+                                                     kilometer=self.regression_daten_dic['auto_kilometerstand'],
+                                                     leistung=self.regression_daten_dic['auto_leistung_ps'],
+                                                     alter=2016-self.regression_daten_dic['erstzulassung'],
+                                                     getriebe=self.regression_daten_dic['getriebe'],
+                                                     fuel=self.regression_daten_dic['antriebsart'],
+                                                     schaden=self.regression_daten_dic['schaden_vorhanden'],
+                                                     preis=self.preisprognose)
+        except Exception as ex:
+            print('Suche konnte nicht abgespeichert werden.')
+            print(ex)

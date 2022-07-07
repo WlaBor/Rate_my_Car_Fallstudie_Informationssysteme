@@ -148,3 +148,54 @@ class Automodel:
         conn.close()
 
         return results
+
+    # ////////////////////////////////////////////
+    # get id
+    def get_id(self, brand, model, vehicletype):
+        conn = sqlite3.connect(self.db_path)
+        c = conn.cursor()
+        c.execute('''
+                  SELECT id FROM AUTOMODELL
+                  WHERE (marke, model, fahrzeug_typ) = (?,?,?)
+                  ORDER BY model
+                  ''', (brand, model, vehicletype))
+
+        auto_id = [element[0] for element in c.fetchall()][0]
+        conn.close()
+        return auto_id
+
+    # ////////////////////////////////////////////
+    # Gebe alle unterschiedlichen Getriebe einer Marke-Model-vehicle Kombination
+    def get_unique_getriebe(self, brand, model, vehicletype):
+        auto_id = self.get_id(brand, model, vehicletype)
+
+        conn = self.create_connection()
+        if conn == None:
+            return
+
+        c = conn.cursor()
+
+        results = []
+
+        try:
+            print('test1')
+            c.execute('''
+                      SELECT DISTINCT auto_getriebe FROM ANZEIGE
+                      WHERE (automodell_id) = (?)
+                      ''', (auto_id,))
+            print('test2')
+            results = [element[0] for element in c.fetchall()]
+            new_labels = []
+            for x in results:
+                if x == 0:
+                    new_labels.append('Manuell')
+                elif x == 1:
+                    new_labels.append('Automatik')
+            results = new_labels
+        except Exception as ex:
+            print('Fehler bei AUTOMODELL Tabelle get_unique_getriebe')
+            print(ex)
+
+        conn.close()
+
+        return results
